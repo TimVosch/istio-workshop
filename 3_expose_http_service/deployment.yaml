@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: workshop-demo
+  name: workshop-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workshop-demo
+  template:
+    metadata:
+      labels:
+        app: workshop-demo
+    spec:
+      containers:
+        - image: workshop/demo
+          imagePullPolicy: Never
+          name: workshop-demo

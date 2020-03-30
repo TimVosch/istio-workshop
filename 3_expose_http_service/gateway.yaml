@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: workshop-gateway
+spec:
+  selector:
+    app: istio-ingressgateway # This is a reference to what Ingress Gateway must be configured
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"

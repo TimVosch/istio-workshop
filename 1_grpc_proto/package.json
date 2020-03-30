@@ -1,0 +1,13 @@
+{
+  "name": "1_grpc_proto",
+  "version": "1.0.0",
+  "description": "This part will have you create a simple Protobuffer that includes a GRPC service.",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Tim van Osch",
+  "license": "MIT",
+  "dependencies": {
+    "grpc-tools": "^1.8.1"
+  }
+}
