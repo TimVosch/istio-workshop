@@ -79,3 +79,5 @@ spec:
             port:
               number: 3000
 ```
+
+After the VirtualService comes `DestinationRule`s. DestinationRules are applied after VirtualServices and further routes traffic. With DestinationRules, environments can be seperated - such as production and staging - or one could apply A/B testing. There are a few examples given in the [Virtual Service documentation](https://istio.io/docs/reference/config/networking/virtual-service). But it won't be applied in this guide.
