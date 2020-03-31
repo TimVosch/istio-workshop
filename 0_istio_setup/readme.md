@@ -28,4 +28,4 @@ Below is a side-by-side comparison to a setup with an Ingress Controller and a s
 
 ![Comparison between Kubernetes Ingress Controllers and Istio](./media/comparison.png)
 
-## [Part 1: Creating a GRPC Protobuffer](../1_grpc_proto)
+## [Part 1: Creating a GRPC Protobuffer](../1_grpc_proto/readme.md)

@@ -69,4 +69,4 @@ $ eval $(minikube docker-env)
 $ docker build -t workshop/demo .
 ```
 
-## [Part 3: Exposing the HTTP Health-Check endpoint](../3_expose_http_service)
+## [Part 3: Exposing the HTTP Health-Check endpoint](../3_expose_http_service/readme.md)

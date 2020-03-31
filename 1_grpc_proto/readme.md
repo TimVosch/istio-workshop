@@ -120,4 +120,4 @@ In one line (for copy-paste purposes)
 $(npm bin)/grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./proto_js/ --grpc_out=./proto_js/ --plugin=protoc-gen-grpc=$(npm bin)/grpc_tools_node_protoc_plugin helloworld.proto
 ```
 
-## [Part 2: Implementing the GRPC Service in an Application](../2_app)
+## [Part 2: Implementing the GRPC Service in an Application](../2_app/readme.md)
