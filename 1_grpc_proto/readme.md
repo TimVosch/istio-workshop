@@ -105,6 +105,8 @@ However, this does not include the GRPC service and methods since GRPC is an ext
 
 For Node.JS we use the `grpc-tools` package and compile:
 
+**Using a linux based system**
+
 ```
 $ npm install grpc-tools
 $ `npm bin`/grpc_tools_node_protoc
@@ -118,6 +120,20 @@ In one line (for copy-paste purposes)
 
 ```
 $(npm bin)/grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./proto_js/ --grpc_out=./proto_js/ --plugin=protoc-gen-grpc=$(npm bin)/grpc_tools_node_protoc_plugin helloworld.proto
+```
+
+**Using a windows based system**
+
+```
+.\node_modules\.bin\grpc_tools_node_protoc.cmd
+  --js_out=import_style=commonjs,binary:./proto_js/
+  --grpc_out=./proto_js/
+  --plugin=protoc-gen-grpc=.\node_modules\.bin\grpc_tools_node_protoc_plugin.cmd
+  helloworld.proto
+```
+
+```
+.\node_modules\.bin\grpc_tools_node_protoc.cmd --js_out=import_style=commonjs,binary:./proto_js/ --grpc_out=./proto_js/ --plugin=protoc-gen-grpc=.\node_modules\.bin\grpc_tools_node_protoc_plugin.cmd helloworld.proto
 ```
 
 ## [Part 2: Implementing the GRPC Service in an Application](../2_app/readme.md)
