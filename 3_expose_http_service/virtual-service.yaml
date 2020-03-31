@@ -20,6 +20,6 @@ spec:
         - destination:
             # This routes the the traffic to the following domain
             # which resolves in the service we created.
-            host: worksworkshop-demo
+            host: workshop-demo
             port:
               number: 3000
