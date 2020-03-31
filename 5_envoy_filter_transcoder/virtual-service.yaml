@@ -1,0 +1,37 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: workshop-virtual-service
+spec:
+  gateways:
+    - workshop-gateway
+  hosts:
+    - "*"
+  http:
+    # We add an HTTP Entry that matches to `/api/health` and
+    # rewrites this to `/health`, it then proxies it to the
+    # workshop-demo service.
+    - match:
+        - uri:
+            exact: "/api/health"
+      rewrite:
+        uri: "/health"
+      route:
+        - destination:
+            # This routes the the traffic to the following domain
+            # which resolves in the service we created.
+            host: workshop-demo
+            port:
+              number: 3000
+    - match:
+        - uri:
+            prefix: "/api/get/"
+      rewrite:
+        uri: "/get/"
+      route:
+        - destination:
+            # This routes the the traffic to the following domain
+            # which resolves in the service we created.
+            host: workshop-demo
+            port:
+              number: 50051

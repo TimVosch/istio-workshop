@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: workshop-demo
+  name: workshop-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workshop-demo
+  template:
+    metadata:
+      labels:
+        app: workshop-demo
+      annotations:
+        sidecar.istio.io/userVolume: '[{"name":"descriptor","configMap":{"name":"workshop-descriptor-set","items":[{"key":"helloworld.pb","path":"helloworld.pb"}]}}]'
+        sidecar.istio.io/userVolumeMount: '[{"name":"descriptor","mountPath":"/etc/envoy"}]'
+    spec:
+      containers:
+        - image: workshop/demo
+          imagePullPolicy: Never
+          name: workshop-demo

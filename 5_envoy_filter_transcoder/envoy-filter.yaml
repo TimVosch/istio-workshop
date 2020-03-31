@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: workshop-demo-filter
+spec:
+  workloadSelector:
+    labels:
+      app: workshop-demo
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          # portNumber: 5000
+          filterChain:
+            filter:
+              name: "envoy.http_connection_manager"
+              subFilter:
+                name: "envoy.router"
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.grpc_json_transcoder
+          config:
+            proto_descriptor: /etc/envoy/helloworld.pb
+            services:
+              - helloworld.Greeter
+            print_options:
+              add_whitespace: true
+              always_print_primitive_fields: true
+              always_print_enums_as_ints: false
+              preserve_proto_field_names: false
