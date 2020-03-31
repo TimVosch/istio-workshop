@@ -26,9 +26,9 @@ A single `.proto` file can contain multiple data objects. These data objects are
 
 ```protobuf
 message Person {
-  required string name = 1;
-  required int32 id = 2;
-  optional string email = 3;
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
 }
 ```
 
