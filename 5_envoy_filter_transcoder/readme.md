@@ -196,3 +196,36 @@ spec:
               always_print_enums_as_ints: false
               preserve_proto_field_names: false
 ```
+
+## Troubleshooting
+
+Unfortunately things might not work, let us try and figure out why.
+
+First we have to try and establish what kind of error we are getting:
+
+### Routing issue
+
+A 404 error is usually due to a routing issue, which means you have most likely misconfigured a Virtual Service, service or gateway.
+
+- **For the Virtual Service, make sure:**
+
+  - you are using the correct match labels: `prefix`, `exact`, `regex`,
+  - you are incorrectly rewriting the url:
+    - when using `prefix` only the prefixed part is rewritten the remainder is concatenated.
+  - you are routing traffic towards the correct service port:
+
+    - When your gateways listens on any port but 80 and your service listens on 80 then you will have to change the destination port to 80 in the Virtual Service:
+
+      ```yaml
+      . . .
+      route:
+        - destination:
+            host: my-awesome-service
+            port: 80
+      ```
+
+- **For the Service, make sure:**
+  - you are correctly referencing your application ports,
+  - you have specified `containerPort` in your pod template ([See link](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#exposing-pods-to-the-cluster))
+- **For the Gateway, make sure:**
+  - you have specified the correct hostname. (use `"*"` to allow all hostnames)
