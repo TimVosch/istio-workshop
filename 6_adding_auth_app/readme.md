@@ -1,15 +1,24 @@
 ## Part 6: Adding authentication to our app
 
-In this part of the guide we will be using Istio to add authentication to our app by verifying Json Web Tokens (JWT). This part will no go in to detail on how to authenticate a user by e-mail and password, and how to sign tokens. We will touch on using Json Web Keys (JWK) with JWT and Istio.  
+In this part of the guide we will be using Istio to add authentication to our app by verifying Json Web Tokens (JWT). This part will not go in to detail on how to authenticate a user by e-mail and password, and how to sign tokens. Although the new app version does provide a `/login` which signs a token. We will touch on using Json Web Keys (JWK) with JWT and Istio.  
 At the end of this part you will have an application that serves public keys in JWK format, and an endpoint which is protected by Istio and only accessible with the right JWT.
 
-### Asymmetric keys
+### Asymmetric keys & terminology
 
 Most JWT examples use a shared key to both sign and verify the token. This often works fine, however when someone else is required to verify a token. You must either share the key or create an endpoint for it. With Asymmetric keys, this is not the case. Asymmetric keys, such as RSA, comes with a public key and a private key. The private key will be used to sign tokens and must not be shared, but the public key can only be used to verify tokens. With this mechanic anyone can verify if a token is signed by the issuer.
 
-Pretty much all big companies have there public keys up for grabbing. Want to see Google's? [Here it is](https://www.googleapis.com/oauth2/v3/certs). In fact, those are several public keys in JWK format. Now whenever someone comes to us with a JWT saying it is signed by google, we can actually verify that it is, but we can not modify it! If this sounds familiar, that is because OAuth works with the same concept.
+Pretty much all big companies have there public keys up for grabbing. Want to see Google's? [Here it is](https://www.googleapis.com/oauth2/v3/certs). In fact, those are several public keys in JWK format. Now whenever someone comes to us with a JWT saying it is signed by google, we can actually verify that it is, but we can not modify it! It might sound familiar, well that is one of the ways how OAuth knows that some other provider authenticated you.
 
-### Creating keys and JWK
+Some words you will see flying are:
+
+- JWT: Json Web Token
+- JWK: Json Web Key
+- JWKS: Json Web Key Set
+- KID: Key IDentifier
+- RSA: an asymmetric encryption algorithm
+- JOSE: Javascript Object Signing and Encryption
+
+### Creating keys and a JWK
 
 Creating asymmetric keys is not difficult, but you require some tools. We generate a private key in the PEM format from which you can extract the public key. Most linux systems come with OpenSSL installed. You can generate your keys with the following command. Make sure you do not provide a password.
 
@@ -100,3 +109,33 @@ WyNC5YNUGVv71mFIcG2YEJKUK7E0fPoxO0KN3lNWiXLFuRWcSU7JsogB_rHdDGcYDVUSCATHhnyD17_l
     ]
 }
 ```
+
+## Configuring Istio
+
+Remember that authentication is the process of identifying who is making the request, and authorization is the process of verifying that the requester has access to do the requested operation. Istio provides both, although you will most likely still require authorization in your app for resource-level access control.
+
+### Request Authentication
+
+`RequestAuthentication` Is the first Kubernetes resource provided by Istio that we will look at. It, as the name suggests, authenticated requests for a specified service. It requires atleast a JWKS endpoint and an issuer (an issuer is the service that signed the token). After configuring the resource, only requests with a valid JWT or without a JWT are allowed. The latter is because we are not authorizing requests yet. If a JWT is invalid, we reject the request because the identity could not be established.
+
+Our application is serving the public JWKS, therefore the `jwksUri` will point towards our application. However, a common pitfall is to only use the service name as domain instead of the [FQDN](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/). This will not work, because Istiod is in the istio-system namespace and does not understand that your app is in the default namespace. (Istiod is the Istio Daemon which is responsible for passing the generated configuration to the proxies, therefore the Istio Daemon must be able to make the JwksUri request.)
+
+```yaml
+apiVersion: "security.istio.io/v1beta1"
+kind: "RequestAuthentication"
+metadata:
+  name: workshop-demo
+spec:
+  selector:
+    matchLabels:
+      app: workshop-demo
+  jwtRules:
+    - issuer: "testing@secure.istio.io"
+      jwksUri: "http://workshop-demo.default.svc.cluster.local/.well-known/jwks.json"
+```
+
+If you want to test this configuration, apply the above yaml to your cluster and make a request to the `/health` endpoint:
+
+- Without a JWT: Success
+- With a valid JWT obtained through `/login`: Success
+- With an invalid JWT: Fail
