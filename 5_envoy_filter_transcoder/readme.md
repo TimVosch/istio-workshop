@@ -229,3 +229,5 @@ A 404 error is usually due to a routing issue, which means you have most likely 
   - you have specified `containerPort` in your pod template ([See link](https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#exposing-pods-to-the-cluster))
 - **For the Gateway, make sure:**
   - you have specified the correct hostname. (use `"*"` to allow all hostnames)
+
+## [Part 6: Adding authentication to our app](../6_adding_auth_app/readme.md)
