@@ -56,4 +56,4 @@ protoc -I. --include_imports --include_source_info --descriptor_set_out=hellowor
 
 The descriptor-set will be used in the next part by the GRPC-JSON transcoder, which is responsible for receiving HTTP/JSON requests and transforming them into GRPC requests.
 
-## [## Part 5: GRPC-JSON Transcoder](../5_envoy_filter_transcoder/readme.md)
+## [Part 5: GRPC-JSON Transcoder](../5_envoy_filter_transcoder/readme.md)
