@@ -16,6 +16,7 @@ COPY package.json .
 
 RUN npm install --production
 
+COPY private.pem .
 COPY src src
 
 CMD ["node", "src/main"]

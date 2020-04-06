@@ -1,0 +1,62 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: workshop-virtual-service
+spec:
+  gateways:
+    - workshop-gateway
+  hosts:
+    - "*"
+  http:
+    # We add an HTTP Entry that matches to `/api/health` and
+    # rewrites this to `/health`, it then proxies it to the
+    # workshop-demo service.
+    - match:
+        - uri:
+            exact: "/api/health"
+      rewrite:
+        uri: "/health"
+      route:
+        - destination:
+            # This routes the the traffic to the following domain
+            # which resolves in the service we created.
+            host: workshop-demo
+            port:
+              number: 3000
+    #
+    # The GRPC-JSON encoded greeter endpoint
+    #
+    - match:
+        - uri:
+            prefix: "/api/get/"
+      rewrite:
+        uri: "/get/"
+      route:
+        - destination:
+            host: workshop-demo
+            port:
+              number: 50051
+    #
+    # The login mock endpoint that signs a JWT
+    #
+    - match:
+        - uri:
+            exact: "/api/login"
+      rewrite:
+        uri: "/login"
+      route:
+        - destination:
+            host: workshop-demo
+            port:
+              number: 3000
+    #
+    # The JWKS endpoint that provides the public keys
+    #
+    - match:
+        - uri:
+            exact: "/.well-known/jwks.json"
+      route:
+        - destination:
+            host: workshop-demo
+            port:
+              number: 3000

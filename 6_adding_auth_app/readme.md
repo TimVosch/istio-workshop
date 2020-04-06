@@ -130,12 +130,50 @@ spec:
     matchLabels:
       app: workshop-demo
   jwtRules:
-    - issuer: "testing@secure.istio.io"
-      jwksUri: "http://workshop-demo.default.svc.cluster.local/.well-known/jwks.json"
+    - issuer: "app"
+      jwksUri: "http://workshop-demo.default.svc:3000/.well-known/jwks.json"
 ```
+
+**Note**: As you can see the jwksUri points to port 3000, that is because we are point to our service not our Virtual Service. The latter redirects port 80 to 3000, but the service does not. That also means that no rewriting or grpc-json transcoding is happening.
 
 If you want to test this configuration, apply the above yaml to your cluster and make a request to the `/health` endpoint:
 
 - Without a JWT: Success
 - With a valid JWT obtained through `/login`: Success
 - With an invalid JWT: Fail
+
+### Authorization Policies
+
+Besides authenticating, we most likely want to specify what endpoints should be allowed to be visit while authenticated and which not. We can do this with an `AuthroizationPolicy`. Authorization Policies define when what is allowed. There are two types of policies: `action: ALLOW` and `action: DENY`. When the action is ALLOW, only that what is defined is allowed and the rest will be denied. When the action is DENY, only that what is specified will be denied and the rest will be allowed.
+
+The policy below applies to our app and has two rules. The first rule only has a `to` keyword. Which means that any traffic to the given paths is allowed. The second rule specifies that only the traffic with a requestPrincipal is allowed on the `/health` path. A requestPrincipal is created from the JWT its issuer and subject keys: `iss/sub`. In our case the issuer will always be `app` and the subject is `demo-user` thus the requestPrincipal will be `app/demo-user`. When a request does not contain a JWT, there will be no requestPrincipal and thus the latter rule will fail, denying the request.
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: workshop-demo
+spec:
+  selector:
+    matchLabels:
+      app: workshop-demo
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            paths: ["/login", "/.well-known/jwks.json"]
+    - to:
+        - operation:
+            paths: ["/health"]
+      from:
+        - source:
+            requestPrincipals: ["*"]
+```
+
+## Testing
+
+Start by applying both the patched virtual-service.yaml and then the authz.yaml. The former adds the new URIs to the virtual-service, such as `/api/login`. After applying both files, you should be able to reach `http://<cluster-ip>/.well-known/jwks.json` and geta JWKS response.
+
+Now try reaching the health-endpoint at `http://<cluster-ip>/api/health`. You should be met with a `403 Forbidden: RBAC: access denied`. That is because in our AuthorizationPolicy we have specified that a JWT is required for the health endpoint. So create a JWT by making a request to `http://<cluster-ip>/api/login`. Then add make a request back to the health-check endpoint, but this time with the header: `Authorization: Bearer <your-jwt-token>`. You should get a proper response.
+
+**Note**: Changes in the RequestAuthentication and AuthorizationPolicies can take up to a minute before fully processed in the cluster.
