@@ -10,7 +10,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "google-protobuf": "^3.11.4",
-    "grpc": "^1.24.2",
+    "grpc": "^1.24.9",
     "jsonwebtoken": "^8.5.1",
     "node-jose": "^1.1.4"
   }
