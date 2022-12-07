@@ -8,7 +8,7 @@
   "author": "Tim van Osch",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "google-protobuf": "^3.11.4",
     "grpc": "^1.24.2",
     "jsonwebtoken": "^8.5.1",
